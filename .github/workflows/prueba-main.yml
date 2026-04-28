@@ -1,15 +1,27 @@
-name: Mi primer github action
+name: Pipeline para revisar archivo
 
 on:
   push:
     branches: ["main"]
 
 jobs:
-  saludo:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Mostrar mensaje
-        run: echo "Hola, este es mi primer mensaje"
-      - name: Fallo intencionado
-        run: exi 1
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Usar NODE JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Construir app con node
+        run: npm install
+      
+      - name: Verificar si app.js existe
+        run: |
+          if [!-f"$GITHUB_WORKSPACE/app.js"]; then
+            echo "No se encontró app.js en la raíz"
+            exit 1
+          fi
+          echo "Se encontró app.js. Continuando con el workflow..."
